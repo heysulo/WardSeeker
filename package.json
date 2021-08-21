@@ -1,0 +1,18 @@
+{
+  "name": "wardseeker",
+  "version": "1.0.0",
+  "description": "Show DOTA2 warding loactions by a player in last few matches",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SulochanaK",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ejs": "^3.1.6"
+  },
+  "devDependencies": {
+
+  }
+}

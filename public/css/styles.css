@@ -1,0 +1,62 @@
+body {
+    background: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react//home/radiant_dire5.jpg") no-repeat fixed center;
+}
+
+.container .navbar-brand {
+    display: flex;
+}
+
+.container .navbar-brand .brand-title {
+    color: white;
+    padding: 0 10px;
+}
+
+.container .navbar-brand + .dev {
+    color: #b7b7b7;
+    font-size: 14px;
+}
+
+.row .map-container {
+    display: flex;
+    flex-direction: column;
+    height: 800px;
+}
+
+.container.form {
+    padding: 50px 0 0 0;
+}
+
+.user-data {
+    display: flex;
+    color: #272727;
+    flex-direction: column;
+}
+
+p.hint {
+    color: #909090;
+    font-size: 0.8em;
+}
+
+span.name {
+    font-weight: bold;
+    font-size: 1.4em;
+}
+
+span.detail {
+    color: #616161;
+    font-size: 0.9em
+}
+
+label.form-label {
+    font-weight: 500 ;
+    color: #7d7d7d;
+}
+
+#mapCanvas {
+    position: relative;
+    top: -800px;
+    left: 0;
+    height: 800px;
+    width: 824px;
+    z-index: 999;
+}

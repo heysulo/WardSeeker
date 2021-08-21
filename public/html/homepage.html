@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>WardSeeker by imsofukindunwit</title>
+    <link rel="shortcut icon" href="public/img/favicon.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
+          crossorigin="anonymous">
+    <link href="public/css/styles.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+
+</head>
+<body ng-app="wardSeeker" ng-cloak>
+<!-- Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Error Occurred</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                An error occurred while attempting to fetch data from STRATZ GraphAPI.
+                This can happen when a huge number of users attempt to use this service.
+                Please try again in 15 to 20 minutes
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<nav class="navbar navbar-light bg-dark" style="--bs-bg-opacity: .8;">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/global/dota2_logo_horiz.png"
+                 width="150px"
+                 height="30px"
+                 alt="DOTA2 WardSeeker">
+            <span class="brand-title">WardSeeker</span>
+        </a>
+        <a class="navbar-brand dev" href="#">by imsofukindunwit</a>
+    </div>
+</nav>
+<div class="container form" ng-controller="WardSeeker as ctrlWardSeeker">
+    <div class="row">
+        <div class="col-lg-8 col-md-6 map-container">
+            <img src="public/img/map.png" height="800" width="824">
+            <canvas id="mapCanvas" width="824" height="800"></canvas>
+        </div>
+        <div class="col-lg-4 col-md-6 map-container">
+            <div class="card" ng-show="timelineMode">
+                <div class="card-header">
+                    Controls
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <img ng-src="{{playerAvatar}}"
+                                 height="128" width="128"
+                                 class="img-thumbnail" alt="...">
+                        </div>
+                        <div class="col-sm-9 user-data">
+                            <span class="name">{{playerName}}</span>
+                            <span class="detail">Last <strong>{{matchCount}}</strong> matches</span>
+                            <span class="detail"><strong>{{ObsCount}}</strong> x Observer, <strong>{{SentCount}}</strong> x Sentry</span>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="customRange1" class="form-label">Time: {{timestamp}}</label>
+                            <input type="range" class="form-range" id="customRange1"
+                                   ng-model="currentTime"
+                                   min="0" max="4000" ng-change="ctrlWardSeeker.showWards(-1)">
+                            <p class="hint">Move the slider to view active wards at the specific time.
+                            Dots with black borders are Observer Wards, and the boxes without borders are Sentry Wards</p>
+                            <p class="hint">All the data were fetched using STRATZ API</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="card" ng-hide="timelineMode">
+                <div class="card-header">
+                    Search with WardSeeker
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="steamIdHelp" class="form-label">SteamID</label>
+                            <input type="text" class="form-control" id="steamID"
+                                   ng-model="steamId"
+                                   aria-describedby="steamIdHelp" placeholder="173410709">
+                            <div id="steamIdHelp" class="form-text">SteamID should be something like: 173410709</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="steamIdHelp" class="form-label">Lane</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="laneRoam" id="laneRoam" checked>
+                                        <label class="form-check-label" for="laneRoam">
+                                            Roaming
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="laneSafe" id="laneSafe" checked>
+                                        <label class="form-check-label" for="laneSafe">
+                                            SafeLane
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="laneMid" id="laneMid" checked>
+                                        <label class="form-check-label" for="laneMid">
+                                            MidLane
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="laneOff" id="laneOff" checked>
+                                        <label class="form-check-label" for="laneOff">
+                                            Offlane
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="laneJungle" id="laneJungle" checked>
+                                        <label class="form-check-label" for="laneJungle">
+                                            Jungle
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="steamIdHelp" class="form-label">Role</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="roleCore" id="roleCore" checked>
+                                        <label class="form-check-label" for="roleCore">
+                                            Core
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="roleSoftSupport" id="roleSoftSupport" checked>
+                                        <label class="form-check-label" for="roleSoftSupport">
+                                            Support
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="roleHardSupport" id="roleHardSupport" checked>
+                                        <label class="form-check-label" for="roleHardSupport">
+                                            HardSupport
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <label for="steamIdHelp" class="form-label">Side</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="sideRadiant" id="sideRadiant" checked>
+                                        <label class="form-check-label" for="sideRadiant">
+                                            Radiant
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" ng-model="sideDire" id="sideDire" checked>
+                                        <label class="form-check-label" for="sideDire">
+                                            Dire
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="matchCount" class="form-label">Number of Matches</label>
+                            <input type="number" class="form-control" id="matchCount"
+                                   ng-model="matchCount"
+                                   min="1" max="15">
+                        </div>
+                        <button type="button" ng-click="onSubmit()" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="public/js/application.js"></script>
+</body>
