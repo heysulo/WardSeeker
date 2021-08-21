@@ -4,7 +4,8 @@
   "description": "Show DOTA2 warding loactions by a player in last few matches",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "SulochanaK",
   "license": "ISC",
